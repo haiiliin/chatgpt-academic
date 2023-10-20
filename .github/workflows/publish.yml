@@ -77,11 +77,13 @@ jobs:
         run: |
           virtualenv venv
           .\venv\Scripts\activate
+          python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install .
           python -m pip install pyinstaller
       - name: Build installer
         run: |
+          .\venv\Scripts\activate
           pyinstaller setup.spec
           makensis setup.nsi
       - name: Upload artifacts
