@@ -50,7 +50,7 @@ var ICONS_GROUP
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "dist\chatgpt-academic-setup-${PRODUCT_VERSION}.exe"
-InstallDir "$PROGRAMFILES\chatgpt-academic"
+InstallDir "C:\ChatGPT-Academic"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -63,8 +63,8 @@ Section "MainSection" SEC01
 ; Shortcuts
   !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\chatgpt-academic.lnk" "$INSTDIR\chatgpt-academic.exe"
-  CreateShortCut "$DESKTOP\chatgpt-academic.lnk" "$INSTDIR\chatgpt-academic.exe"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\ChatGPT-Academic.lnk" "$INSTDIR\chatgpt-academic.exe"
+  CreateShortCut "$DESKTOP\ChatGPT-Academic.lnk" "$INSTDIR\chatgpt-academic.exe"
   !insertmacro MUI_STARTMENU_WRITE_END
 SectionEnd
 
