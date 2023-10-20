@@ -16,7 +16,7 @@ permissions:
   contents: read
 
 env:
-  CHATGPT_ACADEMIC_VERSION: ${{ github.event_name == 'release' && github.ref_name || 'v0.0.1' }}
+  CHATGPT_ACADEMIC_VERSION: ${{ github.ref_name }}
 
 jobs:
   publish:
