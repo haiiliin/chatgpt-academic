@@ -6,12 +6,11 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Publish to PyPI
+name: Release
 
 on:
   release:
     types: [published]
-  pull_request:
 
 permissions:
   contents: read
@@ -37,13 +36,11 @@ jobs:
       - name: Build package
         run: python -m build
       - name: Publish package
-        if: github.event_name == 'release'
         uses: pypa/gh-action-pypi-publish@v1.8.5
         with:
           user: hailin
           password: ${{ secrets.PYPI_PASSWORD }}
       - name: Upload wheels to release
-        if: github.event_name == 'release'
         run: |
           gh release upload --clobber ${{ env.CHATGPT_ACADEMIC_VERSION }} dist/*.tar.gz dist/*.whl
         env:
@@ -58,29 +55,36 @@ jobs:
         with:
           python-version: "3.11"
       - name: Setup NSIS
-        uses: repolevedavaj/install-nsis@v1
+        run: |
+          # Install NSIS
+          iwr -useb get.scoop.sh -outfile 'install.ps1'
+          ./install.ps1 -RunAsAdmin
+          scoop update
+          scoop bucket add extras
+          scoop install nsis
+
+          # Print NSIS version and header info
+          makensis -VERSION
+          makensis -HDRINFO
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install virtualenv
       - name: Create virtualenv
         run: |
-          python -m virtualenv venv
+          virtualenv venv
           .\venv\Scripts\activate
+          python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
           python -m pip install .
           python -m pip install pyinstaller
       - name: Build installer
         run: |
+          .\venv\Scripts\activate
           pyinstaller setup.spec
           makensis setup.nsi
-      - name: Upload artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          path: dist/*.exe
       - name: Upload binaries to release
-        if: github.event_name == 'release'
         run: |
-          gh release upload --clobber ${{ env.CHATGPT_ACADEMIC_VERSION }} dist/*.exe
+          gh release upload --clobber ${{ env.CHATGPT_ACADEMIC_VERSION }} (get-item .\dist\*.exe)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
