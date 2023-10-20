@@ -93,6 +93,6 @@ jobs:
       - name: Upload binaries to release
         if: github.event_name == 'release'
         run: |
-          gh release upload --clobber ${{ env.CHATGPT_ACADEMIC_VERSION }} dist/*.exe
+          gh release upload --clobber ${{ env.CHATGPT_ACADEMIC_VERSION }} (get-item .\dist\*.exe)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
