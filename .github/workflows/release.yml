@@ -18,7 +18,6 @@ permissions:
 
 jobs:
   publish:
-    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -107,7 +106,6 @@ jobs:
           CHATGPT_ACADEMIC_VERSION: ${{ github.event_name == 'release' && github.ref_name || github.head_ref }}
           CHATGPT_SETUP_SUFFIX: ${{ matrix.extra == '' && 'setup' || 'setup-' }}${{ matrix.extra }}
       - name: Upload binaries to release
-        if: github.event_name == 'release'
         run: |
           gh release upload --clobber ${{ github.ref_name }} (get-item .\dist\*.exe)
         env:
