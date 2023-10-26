@@ -73,7 +73,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-all = ["chatgpt-academic[dev,chatglm,chatglm_onnx,jittorllms,newbing,qwen,slackclaude]"]
+all = ["chatgpt-academic[dev,chatglm,chatglm_onnx,jittorllms,moss,newbing,qwen,slackclaude]"]
 dev = [
     "pyinstaller>=6.1.0",
 ]
