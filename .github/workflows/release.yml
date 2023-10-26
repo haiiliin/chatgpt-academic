@@ -58,10 +58,10 @@ jobs:
           - "chatglm_onnx"
           - "jittorllms"
           # - "moss"  # TODO `triton` dependency resolve error
-          - "newbing"
-          - "qwen"
+          # - "newbing"
+          # - "qwen"
           - "slackclaude"
-          - "all"
+          # - "all"
     steps:
       - uses: actions/checkout@v4
         with:
