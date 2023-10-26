@@ -93,21 +93,21 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install -r gradio/requirements.txt
           python -m pip install pyinstaller
-      - name: Install the package and dependencies
+      - if: matrix.extra == 'default'
         run: |
-          if ("${{ matrix.extra }}" = "default") {
-            python -m pip install .
-          }
-          elseif ("${{ matrix.extra }}" = "all") {
-            python -m pip install .[chatglm,chatglm_onnx,jittorllms,moss,newbing,qwen,slackclaude]
-          }
-          else {
-            python -m pip install .[${{ matrix.extra }}]
-          }
-
-          if ("${{ matrix.extra }}" = "all" || "${{ matrix.extra }}" = "moss") {
-            git clone --depth=1 https://github.com/OpenLMLab/MOSS.git request_llm/moss
-          }
+          .\venv\Scripts\activate
+          python -m pip install .
+      - if: matrix.extra == 'all'
+        run: |
+          .\venv\Scripts\activate
+          python -m pip install .[chatglm,chatglm_onnx,jittorllms,moss,newbing,qwen,slackclaude]
+      - if: matrix.extra != 'default' && matrix.extra != 'all'
+        run: |
+          .\venv\Scripts\activate
+          python -m pip install .[${{ matrix.extra }}]
+      - if: matrix.extra == 'all' || matrix.extra == 'moss'
+        run: |
+          git clone --depth=1 https://github.com/OpenLMLab/MOSS.git request_llm/moss
       - name: Build installer
         run: |
           .\venv\Scripts\activate
