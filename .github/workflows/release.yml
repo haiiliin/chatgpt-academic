@@ -106,7 +106,7 @@ jobs:
           makensis setup.nsi
         env:
           CHATGPT_ACADEMIC_VERSION: ${{ github.event_name == 'release' && github.ref_name || github.head_ref }}
-          CHATGPT_SETUP_SUFFIX: setup-${{ matrix.extra }}
+          CHATGPT_SETUP_SUFFIX: ${{ matrix.extra == '' && 'setup' || 'setup-' }}${{ matrix.extra }}
       - name: Upload binaries to release
         if: github.event_name == 'release'
         run: |
