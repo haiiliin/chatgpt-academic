@@ -1,5 +1,5 @@
 from toolbox import update_ui, trimmed_format_exc, get_conf, get_log_folder, promote_file_to_downloadzone
-from toolbox import CatchException, report_execption, update_ui_lastest_msg, zip_result, gen_time_str
+from toolbox import CatchException, report_exception, update_ui_lastest_msg, zip_result, gen_time_str
 from functools import partial
 import glob, os, requests, time
 pj = os.path.join
@@ -73,6 +73,7 @@ def move_project(project_folder, arxiv_id=None):
 
     # align subfolder if there is a folder wrapper
     items = glob.glob(pj(project_folder,'*'))
+    items = [item for item in items if os.path.basename(item)!='__MACOSX']
     if len(glob.glob(pj(project_folder,'*.tex'))) == 0 and len(items) == 1:
         if os.path.isdir(items[0]): project_folder = items[0]
 
@@ -87,6 +88,9 @@ def arxiv_download(chatbot, history, txt, allow_cache=True):
         target_file = pj(translation_dir, 'translate_zh.pdf')
         if os.path.exists(target_file):
             promote_file_to_downloadzone(target_file, rename_file=None, chatbot=chatbot)
+            target_file_compare = pj(translation_dir, 'comparison.pdf')
+            if os.path.exists(target_file_compare):
+                promote_file_to_downloadzone(target_file_compare, rename_file=None, chatbot=chatbot)
             return target_file
         return False
     def is_float(s):
@@ -129,7 +133,7 @@ def arxiv_download(chatbot, history, txt, allow_cache=True):
         yield from update_ui_lastest_msg("调用缓存", chatbot=chatbot, history=history)  # 刷新界面
     else:
         yield from update_ui_lastest_msg("开始下载", chatbot=chatbot, history=history)  # 刷新界面
-        proxies, = get_conf('proxies')
+        proxies = get_conf('proxies')
         r = requests.get(url_tar, proxies=proxies)
         with open(dst, 'wb+') as f:
             f.write(r.content)
@@ -171,12 +175,12 @@ def Latex英文纠错加PDF对比(txt, llm_kwargs, plugin_kwargs, chatbot, histo
         project_folder = txt
     else:
         if txt == "": txt = '空空如也的输入栏'
-        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到本地项目或无权访问: {txt}")
+        report_exception(chatbot, history, a = f"解析项目: {txt}", b = f"找不到本地项目或无权访问: {txt}")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
     file_manifest = [f for f in glob.glob(f'{project_folder}/**/*.tex', recursive=True)]
     if len(file_manifest) == 0:
-        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.tex文件: {txt}")
+        report_exception(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.tex文件: {txt}")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
     
@@ -214,7 +218,6 @@ def Latex英文纠错加PDF对比(txt, llm_kwargs, plugin_kwargs, chatbot, histo
     # <-------------- we are done ------------->
     return success
 
-
 # ========================================= 插件主程序2 =====================================================    
 
 @CatchException
@@ -249,7 +252,7 @@ def Latex翻译中文并重新编译PDF(txt, llm_kwargs, plugin_kwargs, chatbot,
     history = []
     txt, arxiv_id = yield from arxiv_download(chatbot, history, txt, allow_cache)
     if txt.endswith('.pdf'):
-        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"发现已经存在翻译好的PDF文档")
+        report_exception(chatbot, history, a = f"解析项目: {txt}", b = f"发现已经存在翻译好的PDF文档")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
     
@@ -258,13 +261,13 @@ def Latex翻译中文并重新编译PDF(txt, llm_kwargs, plugin_kwargs, chatbot,
         project_folder = txt
     else:
         if txt == "": txt = '空空如也的输入栏'
-        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到本地项目或无法处理: {txt}")
+        report_exception(chatbot, history, a = f"解析项目: {txt}", b = f"找不到本地项目或无法处理: {txt}")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
     
     file_manifest = [f for f in glob.glob(f'{project_folder}/**/*.tex', recursive=True)]
     if len(file_manifest) == 0:
-        report_execption(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.tex文件: {txt}")
+        report_exception(chatbot, history, a = f"解析项目: {txt}", b = f"找不到任何.tex文件: {txt}")
         yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
         return
     

@@ -5,7 +5,6 @@ def check_proxy(proxies):
     try:
         response = requests.get("https://ipapi.co/json/", proxies=proxies, timeout=4)
         data = response.json()
-        # print(f'查询代理的地理位置，返回的结果是{data}')
         if 'country_name' in data:
             country = data['country_name']
             result = f"代理配置 {proxies_https}, 代理所在地：{country}"
@@ -46,9 +45,9 @@ def backup_and_download(current_version, remote_version):
         return new_version_dir
     os.makedirs(new_version_dir)
     shutil.copytree('./', backup_dir, ignore=lambda x, y: ['history'])
-    proxies, = get_conf('proxies')
-    r = requests.get(
-        'https://github.com/binary-husky/chatgpt_academic/archive/refs/heads/master.zip', proxies=proxies, stream=True)
+    proxies = get_conf('proxies')
+    try:    r = requests.get('https://github.com/binary-husky/chatgpt_academic/archive/refs/heads/master.zip', proxies=proxies, stream=True)
+    except: r = requests.get('https://public.gpt-academic.top/publish/master.zip', proxies=proxies, stream=True)
     zip_file_path = backup_dir+'/master.zip'
     with open(zip_file_path, 'wb+') as f:
         f.write(r.content)
@@ -111,11 +110,10 @@ def auto_update(raise_error=False):
     try:
         from toolbox import get_conf
         import requests
-        import time
         import json
-        proxies, = get_conf('proxies')
-        response = requests.get(
-            "https://raw.githubusercontent.com/binary-husky/chatgpt_academic/master/version", proxies=proxies, timeout=5)
+        proxies = get_conf('proxies')
+        try:    response = requests.get("https://raw.githubusercontent.com/binary-husky/chatgpt_academic/master/version", proxies=proxies, timeout=5)
+        except: response = requests.get("https://public.gpt-academic.top/publish/version", proxies=proxies, timeout=5)
         remote_json_data = json.loads(response.text)
         remote_version = remote_json_data['version']
         if remote_json_data["show_feature"]:
@@ -127,8 +125,7 @@ def auto_update(raise_error=False):
             current_version = json.loads(current_version)['version']
         if (remote_version - current_version) >= 0.01-1e-5:
             from colorful import print亮黄
-            print亮黄(
-                f'\n新版本可用。新版本:{remote_version}，当前版本:{current_version}。{new_feature}')
+            print亮黄(f'\n新版本可用。新版本:{remote_version}，当前版本:{current_version}。{new_feature}')
             print('（1）Github更新地址:\nhttps://github.com/binary-husky/chatgpt_academic\n')
             user_instruction = input('（2）是否一键更新代码（Y+回车=确认，输入其他/无输入+回车=不更新）？')
             if user_instruction in ['Y', 'y']:
@@ -154,9 +151,9 @@ def auto_update(raise_error=False):
         print(msg)
 
 def warm_up_modules():
-    print('正在执行一些模块的预热...')
+    print('正在执行一些模块的预热 ...')
     from toolbox import ProxyNetworkActivate
-    from request_llm.bridge_all import model_info
+    from request_llms.bridge_all import model_info
     with ProxyNetworkActivate("Warmup_Modules"):
         enc = model_info["gpt-3.5-turbo"]['tokenizer']
         enc.encode("模块预热", disallowed_special=())
@@ -167,5 +164,5 @@ if __name__ == '__main__':
     import os
     os.environ['no_proxy'] = '*'  # 避免代理网络产生意外污染
     from toolbox import get_conf
-    proxies, = get_conf('proxies')
+    proxies = get_conf('proxies')
     check_proxy(proxies)

@@ -1,11 +1,11 @@
-from toolbox import update_ui, get_conf, trimmed_format_exc, get_log_folder
+from toolbox import update_ui, get_conf, trimmed_format_exc, get_max_token
 import threading
 import os
 import logging
 
 def input_clipping(inputs, history, max_token_limit):
     import numpy as np
-    from request_llm.bridge_all import model_info
+    from request_llms.bridge_all import model_info
     enc = model_info["gpt-3.5-turbo"]['tokenizer']
     def get_token_num(txt): return len(enc.encode(txt, disallowed_special=()))
 
@@ -63,7 +63,7 @@ def request_gpt_model_in_new_thread_with_ui_alive(
     """
     import time
     from concurrent.futures import ThreadPoolExecutor
-    from request_llm.bridge_all import predict_no_ui_long_connection
+    from request_llms.bridge_all import predict_no_ui_long_connection
     # 用户反馈
     chatbot.append([inputs_show_user, ""])
     yield from update_ui(chatbot=chatbot, history=[]) # 刷新界面
@@ -92,7 +92,7 @@ def request_gpt_model_in_new_thread_with_ui_alive(
                     # 【选择处理】 尝试计算比例，尽可能多地保留文本
                     from toolbox import get_reduce_token_percent
                     p_ratio, n_exceed = get_reduce_token_percent(str(token_exceeded_error))
-                    MAX_TOKEN = 4096
+                    MAX_TOKEN = get_max_token(llm_kwargs)
                     EXCEED_ALLO = 512 + 512 * exceeded_cnt
                     inputs, history = input_clipping(inputs, history, max_token_limit=MAX_TOKEN-EXCEED_ALLO)
                     mutable[0] += f'[Local Message] 警告，文本过长将进行截断，Token溢出数：{n_exceed}。\n\n'
@@ -177,11 +177,11 @@ def request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
     """
     import time, random
     from concurrent.futures import ThreadPoolExecutor
-    from request_llm.bridge_all import predict_no_ui_long_connection
+    from request_llms.bridge_all import predict_no_ui_long_connection
     assert len(inputs_array) == len(history_array)
     assert len(inputs_array) == len(sys_prompt_array)
     if max_workers == -1: # 读取配置文件
-        try: max_workers, = get_conf('DEFAULT_WORKER_NUM')
+        try: max_workers = get_conf('DEFAULT_WORKER_NUM')
         except: max_workers = 8
         if max_workers <= 0: max_workers = 3
     # 屏蔽掉 chatglm的多线程，可能会导致严重卡顿
@@ -205,13 +205,12 @@ def request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
         retry_op = retry_times_at_unknown_error
         exceeded_cnt = 0
         mutable[index][2] = "执行中"
+        detect_timeout = lambda: len(mutable[index]) >= 2 and (time.time()-mutable[index][1]) > watch_dog_patience
         while True:
             # watchdog error
-            if len(mutable[index]) >= 2 and (time.time()-mutable[index][1]) > watch_dog_patience: 
-                raise RuntimeError("检测到程序终止。")
+            if detect_timeout(): raise RuntimeError("检测到程序终止。")
             try:
                 # 【第一种情况】：顺利完成
-                # time.sleep(10); raise RuntimeError("测试")
                 gpt_say = predict_no_ui_long_connection(
                     inputs=inputs, llm_kwargs=llm_kwargs, history=history, 
                     sys_prompt=sys_prompt, observe_window=mutable[index], console_slience=True
@@ -219,13 +218,13 @@ def request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
                 mutable[index][2] = "已成功"
                 return gpt_say
             except ConnectionAbortedError as token_exceeded_error:
-                # 【第二种情况】：Token溢出，
+                # 【第二种情况】：Token溢出
                 if handle_token_exceed:
                     exceeded_cnt += 1
                     # 【选择处理】 尝试计算比例，尽可能多地保留文本
                     from toolbox import get_reduce_token_percent
                     p_ratio, n_exceed = get_reduce_token_percent(str(token_exceeded_error))
-                    MAX_TOKEN = 4096
+                    MAX_TOKEN = get_max_token(llm_kwargs)
                     EXCEED_ALLO = 512 + 512 * exceeded_cnt
                     inputs, history = input_clipping(inputs, history, max_token_limit=MAX_TOKEN-EXCEED_ALLO)
                     gpt_say += f'[Local Message] 警告，文本过长将进行截断，Token溢出数：{n_exceed}。\n\n'
@@ -240,6 +239,7 @@ def request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
                     return gpt_say # 放弃
             except:
                 # 【第三种情况】：其他错误
+                if detect_timeout(): raise RuntimeError("检测到程序终止。")
                 tb_str = '```\n' + trimmed_format_exc() + '```'
                 print(tb_str)
                 gpt_say += f"[Local Message] 警告，线程{index}在执行过程中遭遇问题, Traceback：\n\n{tb_str}\n\n"
@@ -256,6 +256,7 @@ def request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency(
                     for i in range(wait):
                         mutable[index][2] = f"{fail_info}等待重试 {wait-i}"; time.sleep(1)
                     # 开始重试
+                    if detect_timeout(): raise RuntimeError("检测到程序终止。")
                     mutable[index][2] = f"重试中 {retry_times_at_unknown_error-retry_op}/{retry_times_at_unknown_error}"
                     continue # 返回重试
                 else:
@@ -602,7 +603,7 @@ def get_files_from_everything(txt, type): # type='.md'
         import requests
         from toolbox import get_conf
         from toolbox import get_log_folder, gen_time_str
-        proxies, = get_conf('proxies')
+        proxies = get_conf('proxies')
         try:
             r = requests.get(txt, proxies=proxies)
         except:

@@ -4,3 +4,6 @@
 [submodule "request_llm/moss"]
 	path = request_llm/moss
 	url = https://github.com/OpenLMLab/MOSS.git
+[submodule "request_llms/moss"]
+	path = request_llms/moss
+	url = https://github.com/OpenLMLab/MOSS.git
