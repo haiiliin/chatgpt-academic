@@ -20,10 +20,12 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 dependencies = [
-    "pydantic==1.10.11",
+    "pypdf2==2.12.1",
     "tiktoken>=0.3.3",
     "requests[socks]",
+    "pydantic==1.10.11",
     "transformers>=4.27.1",
+    "scipdf-parser>=0.52",
     "python-markdown-math",
     "beautifulsoup4",
     "prompt_toolkit",
@@ -31,6 +33,7 @@ dependencies = [
     "python-docx",
     "mdtex2html",
     "anthropic",
+    "pyautogen",
     "colorama",
     "Markdown",
     "pygments",
@@ -41,7 +44,7 @@ dependencies = [
     "rich",
     "pypdf2==2.12.1",
     "websocket-client",
-    "scipdf_parser>=0.3",
+    "scipdf-parser>=0.3",
     # required by gradio
     "aiofiles",
     "aiohttp",
@@ -70,6 +73,7 @@ dependencies = [
     "typing-extensions",
     "uvicorn>=0.14.0",
     "websockets>=10.0",
+    "rich",
 ]
 
 [project.optional-dependencies]
