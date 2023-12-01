@@ -151,5 +151,5 @@ multi-language
 request_llms/moss
 media
 flagged
-request_llm/ChatGLM-6b-onnx-u8s8
+request_llms/ChatGLM-6b-onnx-u8s8
 .pdm-python
