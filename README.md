@@ -9,19 +9,6 @@ pip install chatgpt-academic
 ```
 配置项目请使用 [环境变量](https://github.com/binary-husky/gpt_academic/wiki/项目配置说明#4-环境变量格式说明)。
 
-# <div align=center><img src="docs/logo.png" width="40"> GPT 学术优化 (GPT Academic)</div>
-
-**如果喜欢这个项目，请给它一个Star；如果您发明了好用的快捷键或函数插件，欢迎发pull requests！**
-
-If you like this project, please give it a Star. If you've come up with more useful academic shortcuts or functional plugins, feel free to open an issue or pull request. We also have a README in [English|](docs/README_EN.md)[日本語|](docs/README_JP.md)[한국어|](https://github.com/mldljyh/ko_gpt_academic)[Русский|](docs/README_RS.md)[Français](docs/README_FR.md) translated by this project itself.
-To translate this project to arbitrary language with GPT, read and run [`multi_language.py`](multi_language.py) (experimental).
-
-> **Note**
->
-> 1.请注意只有 **高亮** 标识的函数插件（按钮）才支持读取文件，部分插件位于插件区的**下拉菜单**中。另外我们以**最高优先级**欢迎和处理任何新插件的PR。
->
-> 2.本项目中每个文件的功能都在[自译解报告`self_analysis.md`](https://github.com/binary-husky/gpt_academic/wiki/GPT‐Academic项目自译解报告)详细说明。随着版本的迭代，您也可以随时自行点击相关函数插件，调用GPT重新生成项目的自我解析报告。常见问题[`wiki`](https://github.com/binary-husky/gpt_academic/wiki)。[常规安装方法](#installation) | [一键安装脚本](https://github.com/binary-husky/gpt_academic/releases) | [配置说明](https://github.com/binary-husky/gpt_academic/wiki/%E9%A1%B9%E7%9B%AE%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)。
-
 > **Caution**
 > 
 > 2023.11.12: 某些依赖包尚不兼容python 3.12，推荐python 3.11。
