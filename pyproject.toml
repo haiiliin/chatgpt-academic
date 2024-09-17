@@ -13,13 +13,14 @@ authors = [
 description = "ChatGPT Academic"
 readme = "README.md"
 dynamic = ["version"]
-requires-python = ">=3.8,<3.13"
+requires-python = ">=3.8"
 classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 ]
 dependencies = [
+    "fastapi",
     "pypdf2==2.12.1",
     "tiktoken>=0.3.3",
     "requests[socks]",
@@ -97,8 +98,6 @@ chatglm_onnx = [
     "numpy",
     "onnxruntime",
     "sentencepiece",
-    "streamlit",
-    "streamlit-chat",
 ]
 jittorllms = [
     "jittor>=1.3.7.9",
@@ -130,8 +129,12 @@ newbing = [
     "httpx[socks]",
 ]
 qwen = [
+    "dashscope",
     "modelscope",
     "transformers_stream_generator",
+    "auto-gptq",
+    "optimum",
+    "urllib3<2",
 ]
 slackclaude = [
     "slack-sdk==3.21.3",
