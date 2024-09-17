@@ -37,8 +37,8 @@ jobs:
       - name: Publish package
         uses: pypa/gh-action-pypi-publish@v1.8.5
         with:
-          user: hailin
-          password: ${{ secrets.PYPI_PASSWORD }}
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
       - name: Upload wheels to release
         run: |
           gh release upload --clobber ${{ github.ref_name }} dist/*.tar.gz dist/*.whl
