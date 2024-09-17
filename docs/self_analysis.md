@@ -22,13 +22,13 @@
 | crazy_functions\下载arxiv论文翻译摘要.py | 下载 `arxiv` 论文的 PDF 文件，并提取摘要和翻译 |
 | crazy_functions\代码重写为全英文_多线程.py | 将Python源代码文件中的中文内容转化为英文 |
 | crazy_functions\图片生成.py | 根据激励文本使用GPT模型生成相应的图像 |
-| crazy_functions\对话历史存档.py | 将每次对话记录写入Markdown格式的文件中 |
+| crazy_functions\Conversation_To_File.py | 将每次对话记录写入Markdown格式的文件中 |
 | crazy_functions\总结word文档.py | 对输入的word文档进行摘要生成 |
 | crazy_functions\总结音视频.py | 对输入的音视频文件进行摘要生成 |
-| crazy_functions\批量Markdown翻译.py | 将指定目录下的Markdown文件进行中英文翻译 |
+| crazy_functions\Markdown_Translate.py | 将指定目录下的Markdown文件进行中英文翻译 |
 | crazy_functions\批量总结PDF文档.py | 对PDF文件进行切割和摘要生成 |
 | crazy_functions\批量总结PDF文档pdfminer.py | 对PDF文件进行文本内容的提取和摘要生成 |
-| crazy_functions\批量翻译PDF文档_多线程.py | 将指定目录下的PDF文件进行中英文翻译 |
+| crazy_functions\PDF_Translate.py | 将指定目录下的PDF文件进行中英文翻译 |
 | crazy_functions\理解PDF文档内容.py | 对PDF文件进行摘要生成和问题解答 |
 | crazy_functions\生成函数注释.py | 自动生成Python函数的注释 |
 | crazy_functions\联网的ChatGPT.py | 使用网络爬虫和ChatGPT模型进行聊天回答 |
@@ -155,9 +155,9 @@ toolbox.py是一个工具类库，其中主要包含了一些函数装饰器和�
 
 该程序文件提供了一个用于生成图像的函数`图片生成`。函数实现的过程中，会调用`gen_image`函数来生成图像，并返回图像生成的网址和本地文件地址。函数有多个参数，包括`prompt`(激励文本)、`llm_kwargs`(GPT模型的参数)、`plugin_kwargs`(插件模型的参数)等。函数核心代码使用了`requests`库向OpenAI API请求图像，并做了简单的处理和保存。函数还更新了交互界面，清空聊天历史并显示正在生成图像的消息和最终的图像网址和预览。
 
-## [18/48] 请对下面的程序文件做一个概述: crazy_functions\对话历史存档.py
+## [18/48] 请对下面的程序文件做一个概述: crazy_functions\Conversation_To_File.py
 
-这个文件是名为crazy_functions\对话历史存档.py的Python程序文件，包含了4个函数：
+这个文件是名为crazy_functions\Conversation_To_File.py的Python程序文件，包含了4个函数：
 
 1. write_chat_to_file(chatbot, history=None, file_name=None)：用来将对话记录以Markdown格式写入文件中，并且生成文件名，如果没指定文件名则用当前时间。写入完成后将文件路径打印出来。
 
@@ -165,7 +165,7 @@ toolbox.py是一个工具类库，其中主要包含了一些函数装饰器和�
 
 3. read_file_to_chat(chatbot, history, file_name)：从传入的文件中读取内容，解析出对话历史记录并更新聊天显示框。
 
-4. 对话历史存档(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port)：一个主要函数，用于保存当前对话记录并提醒用户。如果用户希望加载历史记录，则调用read_file_to_chat()来更新聊天显示框。如果用户希望删除历史记录，调用删除所有本地对话历史记录()函数完成删除操作。
+4. Conversation_To_File(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_request)：一个主要函数，用于保存当前对话记录并提醒用户。如果用户希望加载历史记录，则调用read_file_to_chat()来更新聊天显示框。如果用户希望删除历史记录，调用删除所有本地对话历史记录()函数完成删除操作。
 
 ## [19/48] 请对下面的程序文件做一个概述: crazy_functions\总结word文档.py
 
@@ -175,9 +175,9 @@ toolbox.py是一个工具类库，其中主要包含了一些函数装饰器和�
 
 该程序文件包括两个函数：split_audio_file()和AnalyAudio()，并且导入了一些必要的库并定义了一些工具函数。split_audio_file用于将音频文件分割成多个时长相等的片段，返回一个包含所有切割音频片段文件路径的列表，而AnalyAudio用来分析音频文件，通过调用whisper模型进行音频转文字并使用GPT模型对音频内容进行概述，最终将所有总结结果写入结果文件中。
 
-## [21/48] 请对下面的程序文件做一个概述: crazy_functions\批量Markdown翻译.py
+## [21/48] 请对下面的程序文件做一个概述: crazy_functions\Markdown_Translate.py
 
-该程序文件名为`批量Markdown翻译.py`，包含了以下功能：读取Markdown文件，将长文本分离开来，将Markdown文件进行翻译（英译中和中译英），整理结果并退出。程序使用了多线程以提高效率。程序使用了`tiktoken`依赖库，可能需要额外安装。文件中还有一些其他的函数和类，但与文件名所描述的功能无关。
+该程序文件名为`Markdown_Translate.py`，包含了以下功能：读取Markdown文件，将长文本分离开来，将Markdown文件进行翻译（英译中和中译英），整理结果并退出。程序使用了多线程以提高效率。程序使用了`tiktoken`依赖库，可能需要额外安装。文件中还有一些其他的函数和类，但与文件名所描述的功能无关。
 
 ## [22/48] 请对下面的程序文件做一个概述: crazy_functions\批量总结PDF文档.py
 
@@ -187,9 +187,9 @@ toolbox.py是一个工具类库，其中主要包含了一些函数装饰器和�
 
 该程序文件是一个用于批量总结PDF文档的函数插件，使用了pdfminer插件和BeautifulSoup库来提取PDF文档的文本内容，对每个PDF文件分别进行处理并生成中英文摘要。同时，该程序文件还包括一些辅助工具函数和处理异常的装饰器。
 
-## [24/48] 请对下面的程序文件做一个概述: crazy_functions\批量翻译PDF文档_多线程.py
+## [24/48] 请对下面的程序文件做一个概述: crazy_functions\PDF_Translate.py
 
-这个程序文件是一个Python脚本，文件名为“批量翻译PDF文档_多线程.py”。它主要使用了“toolbox”、“request_gpt_model_in_new_thread_with_ui_alive”、“request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency”、“colorful”等Python库和自定义的模块“crazy_utils”的一些函数。程序实现了一个批量翻译PDF文档的功能，可以自动解析PDF文件中的基础信息，递归地切割PDF文件，翻译和处理PDF论文中的所有内容，并生成相应的翻译结果文件（包括md文件和html文件）。功能比较复杂，其中需要调用多个函数和依赖库，涉及到多线程操作和UI更新。文件中有详细的注释和变量命名，代码比较清晰易读。
+这个程序文件是一个Python脚本，文件名为“PDF_Translate.py”。它主要使用了“toolbox”、“request_gpt_model_in_new_thread_with_ui_alive”、“request_gpt_model_multi_threads_with_very_awesome_ui_and_high_efficiency”、“colorful”等Python库和自定义的模块“crazy_utils”的一些函数。程序实现了一个批量翻译PDF文档的功能，可以自动解析PDF文件中的基础信息，递归地切割PDF文件，翻译和处理PDF论文中的所有内容，并生成相应的翻译结果文件（包括md文件和html文件）。功能比较复杂，其中需要调用多个函数和依赖库，涉及到多线程操作和UI更新。文件中有详细的注释和变量命名，代码比较清晰易读。
 
 ## [25/48] 请对下面的程序文件做一个概述: crazy_functions\理解PDF文档内容.py
 
@@ -331,19 +331,19 @@ check_proxy.py, colorful.py, config.py, config_private.py, core_functional.py, c
 这些程序源文件提供了基础的文本和语言处理功能、工具函数和高级插件，使 Chatbot 能够处理各种复杂的学术文本问题，包括润色、翻译、搜索、下载、解析等。
 
 ## 用一张Markdown表格简要描述以下文件的功能：
-crazy_functions\代码重写为全英文_多线程.py, crazy_functions\图片生成.py, crazy_functions\对话历史存档.py, crazy_functions\总结word文档.py, crazy_functions\总结音视频.py, crazy_functions\批量Markdown翻译.py, crazy_functions\批量总结PDF文档.py, crazy_functions\批量总结PDF文档pdfminer.py, crazy_functions\批量翻译PDF文档_多线程.py, crazy_functions\理解PDF文档内容.py, crazy_functions\生成函数注释.py, crazy_functions\联网的ChatGPT.py, crazy_functions\解析JupyterNotebook.py, crazy_functions\解析项目源代码.py, crazy_functions\询问多个大语言模型.py, crazy_functions\读文章写摘要.py。根据以上分析，用一句话概括程序的整体功能。
+crazy_functions\代码重写为全英文_多线程.py, crazy_functions\图片生成.py, crazy_functions\Conversation_To_File.py, crazy_functions\总结word文档.py, crazy_functions\总结音视频.py, crazy_functions\Markdown_Translate.py, crazy_functions\批量总结PDF文档.py, crazy_functions\批量总结PDF文档pdfminer.py, crazy_functions\PDF_Translate.py, crazy_functions\理解PDF文档内容.py, crazy_functions\生成函数注释.py, crazy_functions\联网的ChatGPT.py, crazy_functions\解析JupyterNotebook.py, crazy_functions\解析项目源代码.py, crazy_functions\询问多个大语言模型.py, crazy_functions\读文章写摘要.py。根据以上分析，用一句话概括程序的整体功能。
 
 | 文件名 | 功能简述 |
 | --- | --- |
 | 代码重写为全英文_多线程.py | 将Python源代码文件中的中文内容转化为英文 |
 | 图片生成.py | 根据激励文本使用GPT模型生成相应的图像 |
-| 对话历史存档.py | 将每次对话记录写入Markdown格式的文件中 |
+| Conversation_To_File.py | 将每次对话记录写入Markdown格式的文件中 |
 | 总结word文档.py | 对输入的word文档进行摘要生成 |
 | 总结音视频.py | 对输入的音视频文件进行摘要生成 |
-| 批量Markdown翻译.py | 将指定目录下的Markdown文件进行中英文翻译 |
+| Markdown_Translate.py | 将指定目录下的Markdown文件进行中英文翻译 |
 | 批量总结PDF文档.py | 对PDF文件进行切割和摘要生成 |
 | 批量总结PDF文档pdfminer.py | 对PDF文件进行文本内容的提取和摘要生成 |
-| 批量翻译PDF文档_多线程.py | 将指定目录下的PDF文件进行中英文翻译 |
+| PDF_Translate.py | 将指定目录下的PDF文件进行中英文翻译 |
 | 理解PDF文档内容.py | 对PDF文件进行摘要生成和问题解答 |
 | 生成函数注释.py | 自动生成Python函数的注释 |
 | 联网的ChatGPT.py | 使用网络爬虫和ChatGPT模型进行聊天回答 |

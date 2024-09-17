@@ -33,7 +33,7 @@ explain_msg = """
     - 「请调用插件，解析python源代码项目，代码我刚刚打包拖到上传区了」
     - 「请问Transformer网络的结构是怎样的？」
 
-2. 您可以打开插件下拉菜单以了解本项目的各种能力。    
+2. 您可以打开插件下拉菜单以了解本项目的各种能力。
 
 3. 如果您使用「调用插件xxx」、「修改配置xxx」、「请问」等关键词，您的意图可以被识别的更准确。
 
@@ -67,7 +67,7 @@ class UserIntention(BaseModel):
 def chat(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_intention):
     gpt_say = yield from request_gpt_model_in_new_thread_with_ui_alive(
         inputs=txt, inputs_show_user=txt,
-        llm_kwargs=llm_kwargs, chatbot=chatbot, history=[], 
+        llm_kwargs=llm_kwargs, chatbot=chatbot, history=[],
         sys_prompt=system_prompt
     )
     chatbot[-1] = [txt, gpt_say]
@@ -104,7 +104,7 @@ def analyze_intention_with_simple_rules(txt):
 
 
 @CatchException
-def 虚空终端(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port):
+def 虚空终端(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_request):
     disable_auto_promotion(chatbot=chatbot)
     # 获取当前虚空终端状态
     state = VoidTerminalState.get_state(chatbot)
@@ -115,13 +115,13 @@ def 虚空终端(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt
     if is_the_upload_folder(txt):
         state.set_state(chatbot=chatbot, key='has_provided_explaination', value=False)
         appendix_msg = "\n\n**很好，您已经上传了文件**，现在请您描述您的需求。"
-        
+
     if is_certain or (state.has_provided_explaination):
         # 如果意图明确，跳过提示环节
         state.set_state(chatbot=chatbot, key='has_provided_explaination', value=True)
         state.unlock_plugin(chatbot=chatbot)
         yield from update_ui(chatbot=chatbot, history=history)
-        yield from 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port)
+        yield from 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_request)
         return
     else:
         # 如果意图模糊，提示
@@ -133,7 +133,7 @@ def 虚空终端(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt
 
 
 
-def 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port):
+def 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_request):
     history = []
     chatbot.append(("虚空终端状态: ", f"正在执行任务: {txt}"))
     yield from update_ui(chatbot=chatbot, history=history) # 刷新界面
@@ -152,7 +152,7 @@ def 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, syst
         analyze_res = run_gpt_fn(inputs, "")
         try:
             user_intention = gpt_json_io.generate_output_auto_repair(analyze_res, run_gpt_fn)
-            lastmsg=f"正在执行任务: {txt}\n\n用户意图理解: 意图={explain_intention_to_user[user_intention.intention_type]}", 
+            lastmsg=f"正在执行任务: {txt}\n\n用户意图理解: 意图={explain_intention_to_user[user_intention.intention_type]}",
         except JsonStringError as e:
             yield from update_ui_lastest_msg(
                 lastmsg=f"正在执行任务: {txt}\n\n用户意图理解: 失败 当前语言模型（{llm_kwargs['llm_model']}）不能理解您的意图", chatbot=chatbot, history=history, delay=0)
@@ -161,7 +161,7 @@ def 虚空终端主路由(txt, llm_kwargs, plugin_kwargs, chatbot, history, syst
         pass
 
     yield from update_ui_lastest_msg(
-        lastmsg=f"正在执行任务: {txt}\n\n用户意图理解: 意图={explain_intention_to_user[user_intention.intention_type]}", 
+        lastmsg=f"正在执行任务: {txt}\n\n用户意图理解: 意图={explain_intention_to_user[user_intention.intention_type]}",
         chatbot=chatbot, history=history, delay=0)
 
     # 用户意图: 修改本项目的配置

@@ -29,26 +29,21 @@ def 解析docx(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot
             except:
                 raise RuntimeError('请先将.doc文档转换为.docx文档。')
 
-        print(file_content)
         # private_upload里面的文件名在解压zip后容易出现乱码（rar和7z格式正常），故可以只分析文章内容，不输入文件名
-        from .crazy_utils import breakdown_txt_to_satisfy_token_limit_for_pdf
+        from crazy_functions.pdf_fns.breakdown_txt import breakdown_text_to_satisfy_token_limit
         from request_llms.bridge_all import model_info
         max_token = model_info[llm_kwargs['llm_model']]['max_token']
         TOKEN_LIMIT_PER_FRAGMENT = max_token * 3 // 4
-        paper_fragments = breakdown_txt_to_satisfy_token_limit_for_pdf(
-            txt=file_content,  
-            get_token_fn=model_info[llm_kwargs['llm_model']]['token_cnt'], 
-            limit=TOKEN_LIMIT_PER_FRAGMENT
-        )
+        paper_fragments = breakdown_text_to_satisfy_token_limit(txt=file_content, limit=TOKEN_LIMIT_PER_FRAGMENT, llm_model=llm_kwargs['llm_model'])
         this_paper_history = []
         for i, paper_frag in enumerate(paper_fragments):
             i_say = f'请对下面的文章片段用中文做概述，文件名是{os.path.relpath(fp, project_folder)}，文章内容是 ```{paper_frag}```'
             i_say_show_user = f'请对下面的文章片段做概述: {os.path.abspath(fp)}的第{i+1}/{len(paper_fragments)}个片段。'
             gpt_say = yield from request_gpt_model_in_new_thread_with_ui_alive(
-                inputs=i_say, 
-                inputs_show_user=i_say_show_user, 
+                inputs=i_say,
+                inputs_show_user=i_say_show_user,
                 llm_kwargs=llm_kwargs,
-                chatbot=chatbot, 
+                chatbot=chatbot,
                 history=[],
                 sys_prompt="总结文章。"
             )
@@ -61,10 +56,10 @@ def 解析docx(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot
         if len(paper_fragments) > 1:
             i_say = f"根据以上的对话，总结文章{os.path.abspath(fp)}的主要内容。"
             gpt_say = yield from request_gpt_model_in_new_thread_with_ui_alive(
-                inputs=i_say, 
-                inputs_show_user=i_say, 
+                inputs=i_say,
+                inputs_show_user=i_say,
                 llm_kwargs=llm_kwargs,
-                chatbot=chatbot, 
+                chatbot=chatbot,
                 history=this_paper_history,
                 sys_prompt="总结文章。"
             )
@@ -84,7 +79,7 @@ def 解析docx(file_manifest, project_folder, llm_kwargs, plugin_kwargs, chatbot
 
 
 @CatchException
-def 总结word文档(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, web_port):
+def 总结word文档(txt, llm_kwargs, plugin_kwargs, chatbot, history, system_prompt, user_request):
     import glob, os
 
     # 基本信息：功能、贡献者

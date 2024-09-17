@@ -1,33 +1,44 @@
 
-def check_proxy(proxies):
+def check_proxy(proxies, return_ip=False):
     import requests
     proxies_https = proxies['https'] if proxies is not None else '无'
+    ip = None
     try:
         response = requests.get("https://ipapi.co/json/", proxies=proxies, timeout=4)
         data = response.json()
         if 'country_name' in data:
             country = data['country_name']
             result = f"代理配置 {proxies_https}, 代理所在地：{country}"
+            if 'ip' in data: ip = data['ip']
         elif 'error' in data:
-            alternative = _check_with_backup_source(proxies)
+            alternative, ip = _check_with_backup_source(proxies)
             if alternative is None:
                 result = f"代理配置 {proxies_https}, 代理所在地：未知，IP查询频率受限"
             else:
                 result = f"代理配置 {proxies_https}, 代理所在地：{alternative}"
         else:
             result = f"代理配置 {proxies_https}, 代理数据解析失败：{data}"
-        print(result)
-        return result
+        if not return_ip:
+            print(result)
+            return result
+        else:
+            return ip
     except:
         result = f"代理配置 {proxies_https}, 代理所在地查询超时，代理可能无效"
-        print(result)
-        return result
+        if not return_ip:
+            print(result)
+            return result
+        else:
+            return ip
 
 def _check_with_backup_source(proxies):
     import random, string, requests
     random_string = ''.join(random.choices(string.ascii_letters + string.digits, k=32))
-    try: return requests.get(f"http://{random_string}.edns.ip-api.com/json", proxies=proxies, timeout=4).json()['dns']['geo']
-    except: return None
+    try:
+        res_json = requests.get(f"http://{random_string}.edns.ip-api.com/json", proxies=proxies, timeout=4).json()
+        return res_json['dns']['geo'], res_json['dns']['ip']
+    except:
+        return None, None
 
 def backup_and_download(current_version, remote_version):
     """
@@ -47,7 +58,7 @@ def backup_and_download(current_version, remote_version):
     shutil.copytree('./', backup_dir, ignore=lambda x, y: ['history'])
     proxies = get_conf('proxies')
     try:    r = requests.get('https://github.com/binary-husky/chatgpt_academic/archive/refs/heads/master.zip', proxies=proxies, stream=True)
-    except: r = requests.get('https://public.gpt-academic.top/publish/master.zip', proxies=proxies, stream=True)
+    except: r = requests.get('https://public.agent-matrix.com/publish/master.zip', proxies=proxies, stream=True)
     zip_file_path = backup_dir+'/master.zip'
     with open(zip_file_path, 'wb+') as f:
         f.write(r.content)
@@ -71,7 +82,7 @@ def patch_and_restart(path):
     import sys
     import time
     import glob
-    from colorful import print亮黄, print亮绿, print亮红
+    from shared_utils.colorful import print亮黄, print亮绿, print亮红
     # if not using config_private, move origin config.py as config_private.py
     if not os.path.exists('config_private.py'):
         print亮黄('由于您没有设置config_private.py私密配置，现将您的现有配置移动至config_private.py以防止配置丢失，',
@@ -81,7 +92,7 @@ def patch_and_restart(path):
     dir_util.copy_tree(path_new_version, './')
     print亮绿('代码已经更新，即将更新pip包依赖……')
     for i in reversed(range(5)): time.sleep(1); print(i)
-    try: 
+    try:
         import subprocess
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'])
     except:
@@ -113,7 +124,7 @@ def auto_update(raise_error=False):
         import json
         proxies = get_conf('proxies')
         try:    response = requests.get("https://raw.githubusercontent.com/binary-husky/chatgpt_academic/master/version", proxies=proxies, timeout=5)
-        except: response = requests.get("https://public.gpt-academic.top/publish/version", proxies=proxies, timeout=5)
+        except: response = requests.get("https://public.agent-matrix.com/publish/version", proxies=proxies, timeout=5)
         remote_json_data = json.loads(response.text)
         remote_version = remote_json_data['version']
         if remote_json_data["show_feature"]:
@@ -124,7 +135,7 @@ def auto_update(raise_error=False):
             current_version = f.read()
             current_version = json.loads(current_version)['version']
         if (remote_version - current_version) >= 0.01-1e-5:
-            from colorful import print亮黄
+            from shared_utils.colorful import print亮黄
             print亮黄(f'\n新版本可用。新版本:{remote_version}，当前版本:{current_version}。{new_feature}')
             print('（1）Github更新地址:\nhttps://github.com/binary-husky/chatgpt_academic\n')
             user_instruction = input('（2）是否一键更新代码（Y+回车=确认，输入其他/无输入+回车=不更新）？')
@@ -159,6 +170,14 @@ def warm_up_modules():
         enc.encode("模块预热", disallowed_special=())
         enc = model_info["gpt-4"]['tokenizer']
         enc.encode("模块预热", disallowed_special=())
+
+def warm_up_vectordb():
+    print('正在执行一些模块的预热 ...')
+    from toolbox import ProxyNetworkActivate
+    with ProxyNetworkActivate("Warmup_Modules"):
+        import nltk
+        with ProxyNetworkActivate("Warmup_Modules"): nltk.download("punkt")
+
 
 if __name__ == '__main__':
     import os

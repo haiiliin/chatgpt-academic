@@ -1,7 +1,7 @@
 :root {
     --chatbot-color-light: #000000;
     --chatbot-color-dark: #FFFFFF;
-    --chatbot-background-color-light: #F3F3F3;
+    --chatbot-background-color-light: #FFFFFF;
     --chatbot-background-color-dark: #121111;
     --message-user-background-color-light: #95EC69;
     --message-user-background-color-dark: #26B561;
@@ -196,13 +196,13 @@ footer {
     transition: opacity 0.3s ease-in-out;
 }
 textarea.svelte-1pie7s6 {
-    background: #e7e6e6 !important;
-    width: 96% !important;
+    background: #f1f1f1 !important;
+    width: 100% !important;
 }
 
 .dark textarea.svelte-1pie7s6 {
     background: var(--input-background-fill) !important;
-    width: 96% !important;
+    width: 100% !important;
 }
 
 .dark input[type=number].svelte-1cl284s {
@@ -256,13 +256,13 @@ textarea.svelte-1pie7s6 {
     max-height: 95% !important;
     overflow-y: auto !important;
 }*/
-.app.svelte-1mya07g.svelte-1mya07g {
+/* .app.svelte-1mya07g.svelte-1mya07g {
     max-width: 100%;
     position: relative;
     padding: var(--size-4);
     width: 100%;
     height: 100%;
-}
+} */
 
 .gradio-container-3-32-2 h1 {
     font-weight: 700 !important;
@@ -508,12 +508,14 @@ ol:not(.options), ul:not(.options) {
 [data-testid = "bot"] {
     max-width: 85%;
     border-bottom-left-radius: 0 !important;
+    box-shadow: 2px 2px 0px 1px rgba(0, 0, 0, 0.06);
     background-color: var(--message-bot-background-color-light) !important;
 }
 [data-testid = "user"] {
     max-width: 85%;
     width: auto !important;
     border-bottom-right-radius: 0 !important;
+    box-shadow: 2px 2px 0px 1px rgba(0, 0, 0, 0.06);
     background-color: var(--message-user-background-color-light) !important;
 }
 .dark [data-testid = "bot"] {

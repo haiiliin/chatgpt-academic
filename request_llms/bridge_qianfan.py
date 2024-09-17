@@ -82,6 +82,9 @@ def generate_from_baidu_qianfan(inputs, llm_kwargs, history, system_prompt):
         "ERNIE-Bot":            "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/completions",
         "ERNIE-Bot-turbo":      "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/eb-instant",
         "BLOOMZ-7B":            "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/bloomz_7b1",
+        "ERNIE-Speed-128K":     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-speed-128k",
+        "ERNIE-Speed-8K":       "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie_speed",
+        "ERNIE-Lite-8K":        "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/ernie-lite-8k",
 
         "Llama-2-70B-Chat":     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_2_70b",
         "Llama-2-13B-Chat":     "https://aip.baidubce.com/rpc/2.0/ai_custom/v1/wenxinworkshop/chat/llama_2_13b",
@@ -117,7 +120,8 @@ def generate_from_baidu_qianfan(inputs, llm_kwargs, history, system_prompt):
                 raise RuntimeError(dec['error_msg'])
 
 
-def predict_no_ui_long_connection(inputs, llm_kwargs, history=[], sys_prompt="", observe_window=[], console_slience=False):
+def predict_no_ui_long_connection(inputs:str, llm_kwargs:dict, history:list=[], sys_prompt:str="",
+                                  observe_window:list=[], console_slience:bool=False):
     """
         ⭐多线程方法
         函数的说明请见 request_llms/bridge_all.py
@@ -146,21 +150,22 @@ def predict(inputs, llm_kwargs, plugin_kwargs, chatbot, history=[], system_promp
     yield from update_ui(chatbot=chatbot, history=history)
     # 开始接收回复
     try:
+        response = f"[Local Message] 等待{model_name}响应中 ..."
         for response in generate_from_baidu_qianfan(inputs, llm_kwargs, history, system_prompt):
             chatbot[-1] = (inputs, response)
             yield from update_ui(chatbot=chatbot, history=history)
+        history.extend([inputs, response])
+        yield from update_ui(chatbot=chatbot, history=history)
     except ConnectionAbortedError as e:
         from .bridge_all import model_info
         if len(history) >= 2: history[-1] = ""; history[-2] = "" # 清除当前溢出的输入：history[-2] 是本次输入, history[-1] 是本次输出
-        history = clip_history(inputs=inputs, history=history, tokenizer=model_info[llm_kwargs['llm_model']]['tokenizer'], 
+        history = clip_history(inputs=inputs, history=history, tokenizer=model_info[llm_kwargs['llm_model']]['tokenizer'],
                     max_token_limit=(model_info[llm_kwargs['llm_model']]['max_token'])) # history至少释放二分之一
         chatbot[-1] = (chatbot[-1][0], "[Local Message] Reduce the length. 本次输入过长, 或历史数据过长. 历史缓存数据已部分释放, 您可以请再次尝试. (若再次失败则更可能是因为输入过长.)")
         yield from update_ui(chatbot=chatbot, history=history, msg="异常") # 刷新界面
         return
-    
-    # 总结输出
-    response = f"[Local Message] {model_name}响应异常 ..."
-    if response == f"[Local Message] 等待{model_name}响应中 ...":
-        response = f"[Local Message] {model_name}响应异常 ..."
-    history.extend([inputs, response])
-    yield from update_ui(chatbot=chatbot, history=history)
+    except RuntimeError as e:
+        tb_str = '```\n' + trimmed_format_exc() + '```'
+        chatbot[-1] = (chatbot[-1][0], tb_str)
+        yield from update_ui(chatbot=chatbot, history=history, msg="异常") # 刷新界面
+        return
