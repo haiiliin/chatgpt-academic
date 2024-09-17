@@ -9,11 +9,6 @@ pip install chatgpt-academic
 ```
 配置项目请使用 [环境变量](https://github.com/binary-husky/gpt_academic/wiki/项目配置说明#4-环境变量格式说明)。
 
-> **Caution**
-> 
-> 2023.11.12: 某些依赖包尚不兼容python 3.12，推荐python 3.11。
-> 
-> 2023.11.7: 安装依赖时，请选择`requirements.txt`中**指定的版本**。 安装命令：`pip install -r requirements.txt`。本项目开源免费，近期发现有人蔑视开源协议并利用本项目违规圈钱，请提高警惕，谨防上当受骗。
 > [!IMPORTANT]
 > 2024.6.1: 版本3.80加入插件二级菜单功能（详见wiki）  
 > 2024.5.1: 加入Doc2x翻译PDF论文的功能，[查看详情](https://github.com/binary-husky/gpt_academic/wiki/Doc2x)  
